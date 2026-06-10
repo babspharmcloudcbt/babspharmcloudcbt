@@ -222,7 +222,7 @@ async function init(){
 }
 
 async function loadSubjects(){
-  const{data}=await sb.from('subjects').select('*').eq('university','OAU').order('name');
+  const{data}=await sb.from('subjects').select('*').eq('university','OAU').eq('faculty','Pharmacy').order('name');
   const list=document.getElementById('subject-list');
   if(!data||!data.length){list.innerHTML='<div style="text-align:center;padding:30px;color:var(--gray-400);">No courses found.</div>';return;}
   const COLORS=['#e6f4ea','#e8f0fe','#fff8e1','#fff0f0','#f0f4ff','#fce4ec'];

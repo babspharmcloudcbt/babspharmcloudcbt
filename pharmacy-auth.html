@@ -22,9 +22,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);min-height:100vh
 .feature-icon{font-size:22px;flex-shrink:0;}
 .feature-text h4{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;}
 .feature-text p{font-size:12px;color:rgba(255,255,255,0.7);}
-.portal-link{margin-top:24px;text-align:center;position:relative;z-index:1;}
-.portal-link a{color:rgba(255,255,255,0.8);font-size:13px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;}
-.portal-link a:hover{color:#fff;}
+
 .right-panel{width:48%;display:flex;flex-direction:column;justify-content:center;padding:48px 44px;overflow-y:auto;}
 .auth-header{margin-bottom:32px;}
 .auth-title{font-family:'Sora',sans-serif;font-size:26px;font-weight:800;color:var(--gray-800);margin-bottom:6px;}
@@ -196,7 +194,7 @@ async function handleLogin() {
     const meta = data.user.user_metadata;
     if (meta?.user_type !== 'pharmacy') {
       await sb.auth.signOut();
-      return showAlert('This account is not registered for BabsPharm CBT. Please use the Post UTME portal.');
+      return showAlert('This account is not registered for BabsPharm Cloud CBT.');
     }
     window.location.href = 'pharmacy-dashboard.html';
   } catch(e) {

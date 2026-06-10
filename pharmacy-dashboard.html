@@ -73,12 +73,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);min-height:100vh
 .empty{text-align:center;padding:32px;color:var(--gray-400);font-size:13px;}
 .empty-icon{font-size:36px;margin-bottom:8px;}
 
-/* POSTUTME BANNER */
-.postutme-banner{background:linear-gradient(135deg,#1a3bbd,#2d52e0);border-radius:14px;padding:16px 20px;color:#fff;display:flex;align-items:center;gap:14px;cursor:pointer;margin-bottom:4px;}
-.pb-icon{font-size:28px;flex-shrink:0;}
-.pb-text h4{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;margin-bottom:2px;}
-.pb-text p{font-size:12px;opacity:.8;}
-.pb-arrow{margin-left:auto;font-size:20px;opacity:.7;}
+
 </style>
 </head>
 <body>
@@ -113,16 +108,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);min-height:100vh
     <div class="stat-card"><div class="stat-num" id="stat-best">—</div><div class="stat-label">Best Score</div></div>
   </div>
 
-  <!-- POST UTME BANNER -->
-  <div class="section-title">Also Available</div>
-  <div class="postutme-banner" onclick="window.location.href='postutme-auth.html'">
-    <div class="pb-icon">📝</div>
-    <div class="pb-text">
-      <h4>Post UTME Practice</h4>
-      <p>Also practice for OAU & UI Post UTME entrance exams</p>
-    </div>
-    <div class="pb-arrow">→</div>
-  </div>
+
 
   <!-- COURSES -->
   <div class="section-title">Your Courses</div>
@@ -186,7 +172,7 @@ async function init(){
 }
 
 async function loadSubjects(){
-  const{data}=await sb.from('subjects').select('*').eq('university','OAU').order('name');
+  const{data}=await sb.from('subjects').select('*').eq('university','OAU').eq('faculty','Pharmacy').order('name');
   const grid=document.getElementById('subjects-grid');
   if(!data||!data.length){grid.innerHTML='<div class="empty"><div class="empty-icon">📚</div>No courses added yet.</div>';return;}
   const COLORS=['#e6f4ea','#e8f0fe','#fff8e1','#fff0f0','#f0f4ff','#fce4ec'];
