@@ -75,9 +75,7 @@ input:focus,select:focus{border-color:var(--green);}
         <div class="feature-text"><h4>Completely Free</h4><p>Full access for all Pharmacy students</p></div>
       </div>
     </div>
-    <div class="portal-link">
-      <a href="postutme-auth.html">← Also preparing for Post UTME? Click here</a>
-    </div>
+
   </div>
 </div>
 
@@ -125,17 +123,7 @@ input:focus,select:focus{border-color:var(--green);}
       <label>Password</label>
       <input type="password" id="signup-password" placeholder="At least 6 characters">
     </div>
-    <div class="form-group">
-      <label>Year of Study</label>
-      <div class="level-grid" id="level-grid">
-        <div class="level-card" onclick="selectLevel('100L')"><div class="lc-icon">1️⃣</div><div class="lc-name">100 Level</div></div>
-        <div class="level-card" onclick="selectLevel('200L')"><div class="lc-icon">2️⃣</div><div class="lc-name">200 Level</div></div>
-        <div class="level-card" onclick="selectLevel('300L')"><div class="lc-icon">3️⃣</div><div class="lc-name">300 Level</div></div>
-        <div class="level-card" onclick="selectLevel('400L')"><div class="lc-icon">4️⃣</div><div class="lc-name">400 Level</div></div>
-        <div class="level-card" onclick="selectLevel('500L')"><div class="lc-icon">5️⃣</div><div class="lc-name">500 Level</div></div>
-        <div class="level-card" onclick="selectLevel('Postgrad')"><div class="lc-icon">🎓</div><div class="lc-name">Postgrad</div></div>
-      </div>
-    </div>
+
     <button class="btn btn-primary" id="signup-btn" onclick="handleSignup()">Create Account →</button>
     <div class="form-footer">Already have an account? <a onclick="showTab('login')">Sign in</a></div>
   </div>
@@ -221,20 +209,21 @@ async function handleSignup() {
   const email = document.getElementById('signup-email').value.trim();
   const password = document.getElementById('signup-password').value;
   if (!name || !email || !password) return showAlert('Please fill in all fields.');
-  if (!selectedLevel) return showAlert('Please select your year of study.');
   if (password.length < 6) return showAlert('Password must be at least 6 characters.');
   hideAlert(); setLoading('signup-btn', true);
   try {
     const { data, error } = await sb.auth.signUp({
       email, password,
-      options: { data: {
-        full_name: name,
-        university: 'OAU',
-        faculty: 'Pharmacy',
-        level: selectedLevel,
-        user_type: 'pharmacy',
-        is_activated: true
-      }}
+      options: {
+        emailRedirectTo: undefined,
+        data: {
+          full_name: name,
+          university: 'OAU',
+          faculty: 'Pharmacy',
+          user_type: 'pharmacy',
+          is_activated: true
+        }
+      }
     });
     if (error) throw error;
     // Save to profiles
@@ -245,13 +234,19 @@ async function handleSignup() {
         email: email,
         university: 'OAU',
         faculty: 'Pharmacy',
-        level: selectedLevel,
         user_type: 'pharmacy',
         is_activated: true,
         created_at: new Date().toISOString()
       }, { onConflict: 'id' });
     }
-    showAlert('Account created! Please check your email to verify.', 'success');
+    // Auto-login immediately after signup (no email verification needed)
+    const { data: loginData, error: loginError } = await sb.auth.signInWithPassword({ email, password });
+    if (loginError) {
+      showAlert('Account created! You can now sign in.', 'success');
+      showTab('login');
+    } else {
+      window.location.href = 'pharmacy-dashboard.html';
+    }
   } catch(e) {
     showAlert(e.message || 'Signup failed. Please try again.');
   } finally { setLoading('signup-btn', false); document.getElementById('signup-btn').textContent = 'Create Account →'; }
