@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BabsPharm Cloud CBT — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--blue:#1a3bbd;--green:#2d6a4f;--green-light:#40916c;--gold:#f5a623;--white:#fff;--gray-50:#f8f9fc;--gray-100:#eef0f7;--gray-200:#d8dce8;--gray-400:#8b92a9;--gray-600:#4a5068;--gray-800:#1e2235;--error:#e53e3e;--success:#38a169;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--gray-50);min-height:100vh;display:flex;overflow:hidden;}
+.left-panel{width:52%;background:linear-gradient(145deg,#0f5c2e 0%,#1a7a40 40%,#2d9e5c 70%,#0a3d1e 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:48px;position:relative;overflow:hidden;}
+.left-panel::before{content:'';position:absolute;top:-80px;right:-80px;width:320px;height:320px;background:rgba(255,255,255,0.05);border-radius:50%;}
+.left-panel::after{content:'';position:absolute;bottom:-60px;left:-60px;width:240px;height:240px;background:rgba(255,255,255,0.04);border-radius:50%;}
+.brand{text-align:center;position:relative;z-index:1;}
+.brand-logo{width:72px;height:72px;background:rgba(255,255,255,0.15);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 20px;border:2px solid rgba(255,255,255,0.2);}
+.brand-name{font-family:'Sora',sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:6px;}
+.brand-sub{font-size:14px;color:rgba(255,255,255,0.75);margin-bottom:40px;line-height:1.5;}
+.features{display:flex;flex-direction:column;gap:14px;width:100%;max-width:320px;}
+.feature{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.1);border-radius:12px;padding:14px 16px;border:1px solid rgba(255,255,255,0.1);}
+.feature-icon{font-size:22px;flex-shrink:0;}
+.feature-text h4{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;}
+.feature-text p{font-size:12px;color:rgba(255,255,255,0.7);}
+.portal-link{margin-top:24px;text-align:center;position:relative;z-index:1;}
+.portal-link a{color:rgba(255,255,255,0.8);font-size:13px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;}
+.portal-link a:hover{color:#fff;}
+.right-panel{width:48%;display:flex;flex-direction:column;justify-content:center;padding:48px 44px;overflow-y:auto;}
+.auth-header{margin-bottom:32px;}
+.auth-title{font-family:'Sora',sans-serif;font-size:26px;font-weight:800;color:var(--gray-800);margin-bottom:6px;}
+.auth-sub{font-size:14px;color:var(--gray-400);}
+.tabs{display:flex;gap:4px;background:var(--gray-100);border-radius:12px;padding:4px;margin-bottom:28px;}
+.tab-btn{flex:1;padding:10px;border:none;background:none;border-radius:9px;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:pointer;color:var(--gray-400);transition:all .2s;}
+.tab-btn.active{background:#fff;color:var(--green);box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.form-group{margin-bottom:18px;}
+label{display:block;font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;}
+input,select{width:100%;padding:12px 14px;border:1.5px solid var(--gray-200);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--gray-800);background:#fff;outline:none;transition:border-color .2s;}
+input:focus,select:focus{border-color:var(--green);}
+.btn{width:100%;padding:14px;border:none;border-radius:11px;font-family:'Sora',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-primary{background:linear-gradient(135deg,#1a7a40,#2d9e5c);color:#fff;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(26,122,64,0.35);}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.alert{padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none;}
+.alert.err{background:#fff0f0;color:var(--error);border:1px solid #fcc;}
+.alert.success{background:#e6f4ea;color:var(--success);border:1px solid #b7dfc9;}
+.form-footer{text-align:center;margin-top:16px;font-size:13px;color:var(--gray-400);}
+.form-footer a{color:var(--green);font-weight:600;text-decoration:none;cursor:pointer;}
+.level-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.level-card{border:2px solid var(--gray-200);border-radius:10px;padding:12px;cursor:pointer;text-align:center;transition:all .2s;}
+.level-card:hover,.level-card.selected{border-color:var(--green);background:rgba(26,122,64,0.05);}
+.level-card .lc-icon{font-size:20px;margin-bottom:4px;}
+.level-card .lc-name{font-size:12px;font-weight:700;color:var(--gray-800);}
+@media(max-width:768px){body{flex-direction:column;overflow:auto;}.left-panel{width:100%;padding:32px 24px;}.right-panel{width:100%;padding:32px 24px;}}
+</style>
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <div class="brand">
+    <div class="brand-logo">💊</div>
+    <div class="brand-name">BabsPharm Cloud</div>
+    <div class="brand-sub">OAU Faculty of Pharmacy<br>CBT Practice Platform</div>
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">📚</div>
+        <div class="feature-text"><h4>Course Practice</h4><p>CHM001, PCH201 & more</p></div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">⏱️</div>
+        <div class="feature-text"><h4>Timed CBT Mode</h4><p>Simulate real exam conditions</p></div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🆓</div>
+        <div class="feature-text"><h4>Completely Free</h4><p>Full access for all Pharmacy students</p></div>
+      </div>
+    </div>
+    <div class="portal-link">
+      <a href="postutme-auth.html">← Also preparing for Post UTME? Click here</a>
+    </div>
+  </div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="auth-header">
+    <div class="auth-title">Welcome 👋</div>
+    <div class="auth-sub">Sign in or create your BabsPharm CBT account</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('login')">Sign In</button>
+    <button class="tab-btn" onclick="showTab('signup')">Create Account</button>
+  </div>
+
+  <div id="alert" class="alert"></div>
+
+  <!-- LOGIN -->
+  <div id="login-form">
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="login-email" placeholder="your@email.com">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="Enter password">
+    </div>
+    <button class="btn btn-primary" id="login-btn" onclick="handleLogin()">Sign In →</button>
+    <div class="form-footer">
+      <a onclick="showTab('forgot')">Forgot password?</a>
+    </div>
+  </div>
+
+  <!-- SIGNUP -->
+  <div id="signup-form" style="display:none">
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="signup-name" placeholder="e.g. Adebayo Okonkwo">
+    </div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="signup-email" placeholder="your@email.com">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="signup-password" placeholder="At least 6 characters">
+    </div>
+    <div class="form-group">
+      <label>Year of Study</label>
+      <div class="level-grid" id="level-grid">
+        <div class="level-card" onclick="selectLevel('100L')"><div class="lc-icon">1️⃣</div><div class="lc-name">100 Level</div></div>
+        <div class="level-card" onclick="selectLevel('200L')"><div class="lc-icon">2️⃣</div><div class="lc-name">200 Level</div></div>
+        <div class="level-card" onclick="selectLevel('300L')"><div class="lc-icon">3️⃣</div><div class="lc-name">300 Level</div></div>
+        <div class="level-card" onclick="selectLevel('400L')"><div class="lc-icon">4️⃣</div><div class="lc-name">400 Level</div></div>
+        <div class="level-card" onclick="selectLevel('500L')"><div class="lc-icon">5️⃣</div><div class="lc-name">500 Level</div></div>
+        <div class="level-card" onclick="selectLevel('Postgrad')"><div class="lc-icon">🎓</div><div class="lc-name">Postgrad</div></div>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="signup-btn" onclick="handleSignup()">Create Account →</button>
+    <div class="form-footer">Already have an account? <a onclick="showTab('login')">Sign in</a></div>
+  </div>
+
+  <!-- FORGOT PASSWORD -->
+  <div id="forgot-form" style="display:none">
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="forgot-email" placeholder="your@email.com">
+    </div>
+    <button class="btn btn-primary" id="forgot-btn" onclick="handleForgot()">Send Reset Link →</button>
+    <div class="form-footer"><a onclick="showTab('login')">← Back to Sign In</a></div>
+  </div>
+</div>
+
+<script>
+const SB_URL='https://xdixrqlhctisthfdvzvn.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkaXhycWxoY3Rpc3RoZmR2enZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MTQ1MjEsImV4cCI6MjA5NTI5MDUyMX0.mazAzPT_g_j2L-_ahFz2POO8X5WiymmWLKdoWD3Ziag';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+let selectedLevel = '';
+
+// Check if already logged in
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    const meta = session.user.user_metadata;
+    if (meta?.user_type === 'pharmacy') {
+      window.location.href = 'pharmacy-dashboard.html';
+    }
+  }
+})();
+
+function showTab(tab) {
+  ['login','signup','forgot'].forEach(t => {
+    document.getElementById(t+'-form').style.display = t === tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', (tab==='login'&&i===0)||(tab==='signup'&&i===1));
+  });
+  hideAlert();
+}
+
+function selectLevel(level) {
+  selectedLevel = level;
+  document.querySelectorAll('.level-card').forEach(c => c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+}
+
+function showAlert(msg, type='err') {
+  const el = document.getElementById('alert');
+  el.textContent = msg; el.className = 'alert '+(type==='success'?'success':'err');
+  el.style.display = 'block';
+}
+function hideAlert() { document.getElementById('alert').style.display = 'none'; }
+function setLoading(id, loading) {
+  const btn = document.getElementById(id);
+  btn.disabled = loading;
+  btn.textContent = loading ? 'Please wait...' : btn.textContent;
+}
+
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) return showAlert('Please fill in all fields.');
+  hideAlert(); setLoading('login-btn', true);
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    const meta = data.user.user_metadata;
+    if (meta?.user_type !== 'pharmacy') {
+      await sb.auth.signOut();
+      return showAlert('This account is not registered for BabsPharm CBT. Please use the Post UTME portal.');
+    }
+    window.location.href = 'pharmacy-dashboard.html';
+  } catch(e) {
+    showAlert(e.message || 'Login failed. Please try again.');
+  } finally { setLoading('login-btn', false); document.getElementById('login-btn').textContent = 'Sign In →'; }
+}
+
+async function handleSignup() {
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  if (!name || !email || !password) return showAlert('Please fill in all fields.');
+  if (!selectedLevel) return showAlert('Please select your year of study.');
+  if (password.length < 6) return showAlert('Password must be at least 6 characters.');
+  hideAlert(); setLoading('signup-btn', true);
+  try {
+    const { data, error } = await sb.auth.signUp({
+      email, password,
+      options: { data: {
+        full_name: name,
+        university: 'OAU',
+        faculty: 'Pharmacy',
+        level: selectedLevel,
+        user_type: 'pharmacy',
+        is_activated: true
+      }}
+    });
+    if (error) throw error;
+    // Save to profiles
+    if (data?.user) {
+      await sb.from('profiles').upsert({
+        id: data.user.id,
+        full_name: name,
+        email: email,
+        university: 'OAU',
+        faculty: 'Pharmacy',
+        level: selectedLevel,
+        user_type: 'pharmacy',
+        is_activated: true,
+        created_at: new Date().toISOString()
+      }, { onConflict: 'id' });
+    }
+    showAlert('Account created! Please check your email to verify.', 'success');
+  } catch(e) {
+    showAlert(e.message || 'Signup failed. Please try again.');
+  } finally { setLoading('signup-btn', false); document.getElementById('signup-btn').textContent = 'Create Account →'; }
+}
+
+async function handleForgot() {
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!email) return showAlert('Please enter your email.');
+  hideAlert(); setLoading('forgot-btn', true);
+  try {
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/pharmacy-auth.html' });
+    if (error) throw error;
+    showAlert('Password reset link sent! Check your email.', 'success');
+  } catch(e) {
+    showAlert(e.message || 'Failed to send reset link.');
+  } finally { setLoading('forgot-btn', false); document.getElementById('forgot-btn').textContent = 'Send Reset Link →'; }
+}
+</script>
+</body>
+</html>
